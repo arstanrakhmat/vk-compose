@@ -8,21 +8,18 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import ar.arstan.vkcustom.MainViewModel
 import ar.arstan.vkcustom.PostCard
 import ar.arstan.vkcustom.domain.FeedPost
 
 @Composable
-fun MainScreen() {
-
-    val feedPost = remember {
-        mutableStateOf(FeedPost())
-    }
+fun MainScreen(viewModel: MainViewModel) {
 
     Scaffold(
         bottomBar = {
@@ -61,22 +58,15 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
+        val feedPost = viewModel.feedPost.observeAsState(FeedPost())
+
         PostCard(
             modifier = Modifier.padding(innerPadding),
             feedPost = feedPost.value,
-            onStatisticsItemClickListener = { newItem ->
-                val oldStatistics = feedPost.value.statistics
-                val newStatistics = oldStatistics.toMutableList().apply {
-                    replaceAll { oldItem ->
-                        if (oldItem.type == newItem.type) {
-                            oldItem.copy(count = oldItem.count + 1)
-                        } else {
-                            oldItem
-                        }
-                    }
-                }
-                feedPost.value = feedPost.value.copy(statistics = newStatistics)
-            }
+            onLikeClickListener = { viewModel.updateCount(item = it) },
+            onShareClickListener = { viewModel.updateCount(item = it) },
+            onViewsClickListener = { viewModel.updateCount(item = it) },
+            onCommentClickListener = { viewModel.updateCount(item = it) }
         )
     }
 }
