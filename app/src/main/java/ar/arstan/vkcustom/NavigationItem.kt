@@ -1,11 +1,10 @@
-package ar.arstan.vkcustom.ui.theme
+package ar.arstan.vkcustom
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import ar.arstan.vkcustom.R
 
 sealed class NavigationItem(
     val titleResId: Int,
