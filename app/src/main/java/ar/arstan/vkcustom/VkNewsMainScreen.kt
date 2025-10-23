@@ -18,20 +18,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import ar.arstan.vkcustom.navigation.AppNavGraph
-import ar.arstan.vkcustom.navigation.Screen
+import ar.arstan.vkcustom.navigation.rememberNavigationState
 import ar.arstan.vkcustom.ui.theme.Black500
 import ar.arstan.vkcustom.ui.theme.Black900
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    val navHostController = rememberNavController()
+    val navigationState = rememberNavigationState()
 
     Scaffold(
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+                val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
@@ -44,13 +43,7 @@ fun MainScreen(viewModel: MainViewModel) {
                     NavigationBarItem(
                         selected = currentRoute == item.screen.route,
                         onClick = {
-                            navHostController.navigate(route = item.screen.route) {
-                                popUpTo(Screen.NewsFeed.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navigationState.navigateTo(item.screen.route)
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -73,7 +66,7 @@ fun MainScreen(viewModel: MainViewModel) {
         }
     ) { innerPadding ->
         AppNavGraph(
-            navHostController = navHostController,
+            navHostController = navigationState.navHostController,
             homeScreenContent = { HomeScreen(viewModel = viewModel, paddingValues = innerPadding) },
             favoriteScreenContent = {
                 TextCounter(
