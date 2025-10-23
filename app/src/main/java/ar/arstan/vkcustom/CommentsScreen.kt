@@ -35,14 +35,15 @@ import ar.arstan.vkcustom.ui.theme.Black900
 @Composable
 fun CommentsScreen(
     feedPost: FeedPost,
-    comments: List<PostComment>
+    comments: List<PostComment>,
+    onBackPressed: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Comments for FeedPost Id: ${feedPost.id}") },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { onBackPressed() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null

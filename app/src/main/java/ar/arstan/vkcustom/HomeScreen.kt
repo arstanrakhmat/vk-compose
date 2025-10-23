@@ -1,5 +1,6 @@
 package ar.arstan.vkcustom
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -9,14 +10,49 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ar.arstan.vkcustom.domain.FeedPost
 
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel,
     paddingValues: PaddingValues
 ) {
-    val feedPosts = viewModel.feedPosts.observeAsState(listOf())
+    val screenState = viewModel.screenState.observeAsState(HomeScreenState.Initial)
 
+    when (val currentState = screenState.value) {
+        is HomeScreenState.Posts -> {
+            FeedPosts(
+                posts = currentState.posts,
+                viewModel = viewModel,
+                paddingValues = paddingValues
+            )
+        }
+
+        is HomeScreenState.Comments -> {
+            CommentsScreen(
+                feedPost = currentState.post,
+                comments = currentState.comments,
+                onBackPressed = {
+                    viewModel.closeComments()
+                }
+            )
+            BackHandler {
+                viewModel.closeComments()
+            }
+        }
+
+        is HomeScreenState.Initial -> {
+
+        }
+    }
+}
+
+@Composable
+private fun FeedPosts(
+    posts: List<FeedPost>,
+    viewModel: MainViewModel,
+    paddingValues: PaddingValues
+) {
     LazyColumn(
         modifier = Modifier.padding(paddingValues),
         contentPadding = PaddingValues(
@@ -28,7 +64,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(
-            feedPosts.value,
+            items = posts,
             key = { it.id }
         ) { feedPost ->
             PostCard(
@@ -42,8 +78,8 @@ fun HomeScreen(
                 onViewsClickListener = { statisticItem ->
                     viewModel.updateCount(feedPost, statisticItem)
                 },
-                onCommentClickListener = { statisticItem ->
-                    viewModel.updateCount(feedPost, statisticItem)
+                onCommentClickListener = {
+                    viewModel.showComments(feedPost)
                 }
             )
         }
